@@ -3,6 +3,7 @@
 
 #include <QTcpSocket>
 #include <QDataStream>
+#include <QThread>
 #include <QTimer>
 // divisible par 7 (size of one pixel) + 2 (size of chunck)
 #define SIZE_BUFFER 4090
@@ -19,11 +20,12 @@ class Socket : public QObject
 public:
     Socket(QString ip, int port);
     ~Socket();
+    void start(const QPixmap &pixmap);
 
 public slots:
     void createSocket();
     bool writeData(QByteArray data);
-
+    void start();
 
 private slots:
     void readFortune();
@@ -32,6 +34,7 @@ private slots:
 
 private:
     QTcpSocket              *tcpSocket;
+    QThread                 cThread;
     QDataStream             in;
     QString                 currentFortune;
     QNetworkSession         *networkSession;

@@ -6,11 +6,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
- //   QTimer *timer = new QTimer(this);
+//   QTimer *timer = new QTimer(this);
 //    connect(timer, SIGNAL(timeout()), this, SLOT(shootScreen()));
 //    timer->start(30);
-    worker = new Worker();
-    shootScreen();
+    poolThread = new PoolThread();
+    poolThread->startSocket();
+    QScreen *screen = QGuiApplication::screens().first();
+        if (const QWindow *window = windowHandle())
+            screen = window->screen();
+        if (!screen)
+            return;
+    poolThread->startScreenShot(screen);
 }
 
 MainWindow::~MainWindow()
@@ -29,17 +35,8 @@ void MainWindow::getPixelsImage() {
 
 void MainWindow::shootScreen()
 {
-    QScreen *screen = QGuiApplication::screens().first();
-    if (const QWindow *window = windowHandle())
-        screen = window->screen();
-    if (!screen)
-        return;
-
-    originalPixmap = screen->grabWindow(0);
-    originalPixmap = originalPixmap.scaled(1920, 1080);
-    worker->start(originalPixmap);
-    connect(worker, SIGNAL(finished()), this, SLOT(onWorkerDone()));
-    updateScreenshotLabel();
+//    connect(worker, SIGNAL(finished()), this, SLOT(onWorkerDone()));
+//      updateScreenshotLabel();
 }
 
 void MainWindow::updateScreenshotLabel()

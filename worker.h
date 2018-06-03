@@ -12,7 +12,7 @@ class Worker : public QObject {
 public:
     Worker();
     ~Worker();
-    void start(const QPixmap &pixmap);
+    void start(QScreen *screen);
 
 public slots:
     void process();
@@ -25,7 +25,7 @@ signals:
 private:
     // add your variables here
     QThread cThread;
+    QScreen *screen;
     QPixmap originalPixmap;
-    Socket  *socket;
 };
 #endif // WORKER_H

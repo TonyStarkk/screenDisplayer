@@ -1,7 +1,13 @@
 #include "socket.h"
 
-Socket::Socket(QString ip, int port) : tcpSocket(new QTcpSocket(this)), networkSession(Q_NULLPTR), _ip(ip), _port(port)
+Socket::Socket(QString ip, int port) : networkSession(Q_NULLPTR), _ip(ip), _port(port)
 {
+
+}
+
+void Socket::createSocket()
+{
+    tcpSocket = new QTcpSocket();
     in.setDevice(tcpSocket);
     in.setVersion(QDataStream::Qt_4_0);
 
@@ -9,10 +15,6 @@ Socket::Socket(QString ip, int port) : tcpSocket(new QTcpSocket(this)), networkS
 
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(tcpSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error), this, &Socket::displayError);
-}
-
-void Socket::createSocket()
-{
     tcpSocket->connectToHost(_ip, _port);
     tcpSocket->waitForConnected();
 }
@@ -34,6 +36,14 @@ void Socket::readFortune()
 
     currentFortune = nextFortune;
 }
+
+void Socket::start() {
+    moveToThread(&cThread);
+    connect(&cThread, SIGNAL(started()), this, SLOT(createSocket()));
+//    connect(this, SIGNAL(finished()), &cThread, SLOT(quit()));
+    cThread.start();
+}
+
 
 void Socket::displayError(QAbstractSocket::SocketError socketError)
 {
@@ -61,6 +71,7 @@ QByteArray Socket::IntToArray(qint32 source) //Use qint32 to ensure that the num
 
 bool Socket::writeData(QByteArray data)
 {
+    qDebug("send sockettttt");
     if(tcpSocket->state() == QAbstractSocket::ConnectedState)
     {
 //        tcpSocket->write(IntToArray(data.size())); //write size of data

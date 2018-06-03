@@ -6,7 +6,7 @@
 #include <QtWidgets>
 #include "socket.h"
 #include "worker.h"
-
+#include "poolthread.h"
 
 namespace Ui {
 class MainWindow;
@@ -31,8 +31,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QPixmap originalPixmap;
-    Socket *socket;
-    Worker *worker;
+    PoolThread *poolThread;
 };
 
 #endif // MAINWINDOW_H
